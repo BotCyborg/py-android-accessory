@@ -1,4 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# coding=utf-8
+#
+# Copyright 2016 Arn-O. See the LICENSE file at the top-level directory of this
+# distribution and at
+# https://github.com/Arn-O/py-android-accessory/blob/dev/LICENSE.
+
+"""
+Simple Android Accessory client in Python.
+"""
 
 import usb.core
 import sys
@@ -154,12 +163,10 @@ def wait_for_command(ldev):
 
     return
 
-# Define a main() function 
 def main():
-
+    """Where everything starts"""
     dev = start_accessory_mode()
     wait_for_command(dev)
 
-# 'This is the standard boilerplate that calls the main() function.
 if __name__ == '__main__':
     main()
