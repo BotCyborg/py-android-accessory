@@ -81,12 +81,14 @@ def send_string(ldev, str_id, str_val):
     return 
 
 def sensor_variation(toss):
+    """Return sensor variation"""
     return {
         -10: -1,
         10: 1
     }.get(toss, 0)
 
 def sensor_output(lsensor, variation):
+    """Keep the sensor value between 0 and 100"""
     output = lsensor + variation
     if output < 0:
         output = 0
@@ -95,48 +97,44 @@ def sensor_output(lsensor, variation):
             output = 100
     return output
 
-def wait_for_command(ldev):
+def communication_loop(ldev):
+    """Accessory client to device communication loop"""
     sensor = 50
     while True:
+        # random sensor variation
+        toss = random.randint(-10, 10)
+        if sensor + sensor_variation(toss) in range(0, 101):
+            sensor = sensor + sensor_variation(toss)
+        # write to device
+        msg = "S{:04}".format(sensor)
+        print "<<< {}".format(msg)
         try:
-            toss = random.randint(-10, 10)
-            if sensor + sensor_variation(toss) in range(0, 101):
-                sensor = sensor + sensor_variation(toss)
-            print ('Sensor: %i' % sensor)
-            msg = ('S%0.4i' % sensor)
-            print('<<< ' + msg),
-            try:
-                ret = ldev.write(0x02, msg, 150)
-                if ret == len(msg):
-                    print(' - Write OK')
-            except usb.core.USBError as e:
+            ret = ldev.write(0x02, msg, 150)
+            assert ret == len(msg)
+        except usb.core.USBError as e:
+            if e.errno == 19:
+                break
+            print e
+        # read from device
+        try:
+            ret = ldev.read(0x81, 5, 150)
+            sret = ''.join([chr(x) for x in ret])
+            print ">>> {}".format(sret)
+            if sret == "A1111":
+                 variation = -3
+            else:
+                if sret == "A0000":
+                    variation = 3 
+            sensor = sensor_output(sensor, variation)
+        except usb.core.USBError as e:
+            if e.errno == 19:
+                break
+            if e.errno == 110:
+                # a timeout is OK, no message has been sent
+                pass
+            else:
                 print e
-
-            try:
-                ret = ldev.read(0x81, 5, 150)
-                sret = ''.join([chr(x) for x in ret])
-                print('>>> '),
-                print sret
-                if sret == "A1111":
-                    variation = -3
-                else:
-                    if sret == "A0000":
-                        variation = 3 
-                sensor = sensor_output(sensor, variation)
-            except usb.core.USBError as e:
-                if e.errno == 110:
-                    pass
-                else:
-                    print
-                    print e
-            time.sleep(0.2)
-        except KeyboardInterrupt:
-            print "Bye!"
-            break
-        
-
-#        msg='test'
-
+        time.sleep(0.2)
     return
 
 def main():
@@ -150,9 +148,9 @@ def main():
         if not adev:
             continue
         print "Will now communicate with device"
+        communication_loop(adev)
         break
         time.sleep(1)
-    #wait_for_command(dev)
 
 if __name__ == '__main__':
     main()
