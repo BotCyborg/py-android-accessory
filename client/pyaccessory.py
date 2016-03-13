@@ -17,17 +17,20 @@ import random
 VID_ANDROID_ACCESSORY = 0x18d1
 PID_ANDROID_ACCESSORY = 0x2d01
 
-def get_accessory():
-    print('Looking for Android Accessory')
-    print('VID: 0x%0.4x - PID: 0x%0.4x'
-        % (VID_ANDROID_ACCESSORY, PID_ANDROID_ACCESSORY))
-    dev = usb.core.find(idVendor=VID_ANDROID_ACCESSORY, 
-                        idProduct=PID_ANDROID_ACCESSORY)
-    return dev
+def get_accessory_dev(ldev):
+    """Trigger accessory mode and send the dev handler"""
+    set_strings(ldev)
+    set_accessory_mode(ldev)
+    adev = usb.core.find(
+        idVendor=VID_ANDROID_ACCESSORY, 
+        idProduct=PID_ANDROID_ACCESSORY
+    )
+    if adev:
+        print "Android accessory mode started"
+    return adev
 
-def get_android_device():
+def get_android_dev():
     """Look for a potential Android device"""
-    print "Looking for an Android device"
     ldev = usb.core.find(bDeviceClass=0)
     if ldev:
         print "Device found"
@@ -35,8 +38,6 @@ def get_android_device():
             ldev.idVendor,
             ldev.idProduct
         )
-    else:
-        sys.exit("No Android device found")
     return ldev
 
 def set_protocol(ldev):
@@ -78,22 +79,6 @@ def send_string(ldev, str_id, str_val):
     ret = ldev.ctrl_transfer(0x40, 52, 0, str_id, str_val, 0)
     assert ret == len(str_val)
     return 
-
-def start_accessory_mode():
-    """Start the accessory mode on the Android device"""
-    #dev = get_accessory()
-    #if not dev:
-    #print('Android accessory not found')
-    #print('Try to start accessory mode')
-    dev = get_android_device()
-    #set_protocol(dev)
-    set_strings(dev)
-    set_accessory_mode(dev)
-    dev = get_accessory()
-    #if not dev:
-        #sys.exit('Unable to start accessory mode')
-    #print('Accessory mode started')
-    return dev
 
 def sensor_variation(toss):
     return {
@@ -156,9 +141,15 @@ def wait_for_command(ldev):
 
 def main():
     """Where everything starts"""
-    dev = start_accessory_mode()
-    if dev:
-        print "Accessory mode started"
+    print "Looking for an Android device"
+    while True:
+        ddev = get_android_dev()
+        if ddev:
+            adev = get_accessory_dev(ddev)
+            if adev:
+                print "Will now communicate with device"
+            break
+        time.sleep(1)
     #wait_for_command(dev)
 
 if __name__ == '__main__':
