@@ -144,11 +144,13 @@ def main():
     print "Looking for an Android device"
     while True:
         ddev = get_android_dev()
-        if ddev:
-            adev = get_accessory_dev(ddev)
-            if adev:
-                print "Will now communicate with device"
-            break
+        if not ddev:
+            continue
+        adev = get_accessory_dev(ddev)
+        if not adev:
+            continue
+        print "Will now communicate with device"
+        break
         time.sleep(1)
     #wait_for_command(dev)
 
