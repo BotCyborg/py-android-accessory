@@ -114,6 +114,9 @@ def communication_loop(ldev):
         except usb.core.USBError as e:
             if e.errno == 19:
                 break
+            if e.errno == 110:
+                # the application has been stopped
+                break
             print e
         # read from device
         try:
