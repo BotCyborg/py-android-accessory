@@ -19,6 +19,7 @@ PID_ANDROID_ACCESSORY = 0x2d01
 
 def get_accessory_dev(ldev):
     """Trigger accessory mode and send the dev handler"""
+    set_protocol(ldev)
     set_strings(ldev)
     set_accessory_mode(ldev)
     adev = usb.core.find(
@@ -42,19 +43,17 @@ def get_android_dev():
 
 def set_protocol(ldev):
     """Set the USB configuration"""
-    #try:
-    ldev.set_configuration()
-    #except usb.core.USBError as e:
-    #if  e.errno == 16:
-    #        print('Device already configured, should be OK')
-    #    else:
-    #        sys.exit('Configuration failed')
+    try:
+        ldev.set_configuration()
+    except usb.core.USBError as e:
+        if  e.errno == 16:
+            pass
+        else:
+            sys.exit(e)
     ret = ldev.ctrl_transfer(0xC0, 51, 0, 0, 2)
     print ret
     protocol = ret[0]
-    print('Protocol version: %i' % protocol)
-    if protocol < 2:
-        sys.exit('Android Open Accessory protocol v2 not supported')
+    print "Protocol version: {}".format(protocol)
     return
 
 def set_strings(ldev):
@@ -75,7 +74,7 @@ def set_accessory_mode(ldev):
     return
 
 def send_string(ldev, str_id, str_val):
-    """Send a give string to the Android device"""
+    """Send a given string to the Android device"""
     ret = ldev.ctrl_transfer(0x40, 52, 0, str_id, str_val, 0)
     assert ret == len(str_val)
     return 
@@ -103,8 +102,7 @@ def communication_loop(ldev):
     while True:
         # random sensor variation
         toss = random.randint(-10, 10)
-        if sensor + sensor_variation(toss) in range(0, 101):
-            sensor = sensor + sensor_variation(toss)
+        sensor = sensor_output(sensor, sensor_variation(toss))
         # write to device
         msg = "S{:04}".format(sensor)
         print "<<< {}".format(msg)
