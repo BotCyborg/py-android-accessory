@@ -61,7 +61,7 @@ def set_strings(ldev):
     send_string(ldev, 0, 'Arn-O')
     send_string(ldev, 1, 'PyAndroidAccessory')
     send_string(ldev, 2, 'A Python based Android accessory')
-    send_string(ldev, 3, '0.1.0-beta')
+    send_string(ldev, 3, '0.1.1-beta')
     send_string(ldev, 4, 
             'https://github.com/Arn-O/py-android-accessory/')
     return
