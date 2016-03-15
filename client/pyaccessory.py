@@ -3,7 +3,7 @@
 #
 # Copyright 2016 Arn-O. See the LICENSE file at the top-level directory of this
 # distribution and at
-# https://github.com/Arn-O/py-android-accessory/blob/dev/LICENSE.
+# https://github.com/Arn-O/py-android-accessory/blob/master/LICENSE.
 
 """
 Simple Android Accessory client in Python.
@@ -17,6 +17,7 @@ import random
 VID_ANDROID_ACCESSORY = 0x18d1
 PID_ANDROID_ACCESSORY = 0x2d01
 
+
 def get_accessory_dev(ldev):
     """Trigger accessory mode and send the dev handler"""
     set_protocol(ldev)
@@ -29,6 +30,7 @@ def get_accessory_dev(ldev):
     if adev:
         print "Android accessory mode started"
     return adev
+
 
 def get_android_dev():
     """Look for a potential Android device"""
@@ -45,6 +47,7 @@ def get_android_dev():
         )
     return ldev
 
+
 def set_protocol(ldev):
     """Set the USB configuration"""
     try:
@@ -59,15 +62,20 @@ def set_protocol(ldev):
     print "Protocol version: {}".format(protocol)
     return
 
+
 def set_strings(ldev):
     """Send series of strings to activate accessory mode"""
     send_string(ldev, 0, 'Arn-O')
     send_string(ldev, 1, 'PyAndroidAccessory')
     send_string(ldev, 2, 'A Python based Android accessory')
     send_string(ldev, 3, '0.1.1-beta')
-    send_string(ldev, 4, 
-            'https://github.com/Arn-O/py-android-accessory/')
+    send_string(
+        ldev,
+        4,
+        'https://github.com/Arn-O/py-android-accessory/'
+    )
     return
+
 
 def set_accessory_mode(ldev):
     """Trigger the accessory mode"""
@@ -76,11 +84,13 @@ def set_accessory_mode(ldev):
     time.sleep(1)
     return
 
+
 def send_string(ldev, str_id, str_val):
     """Send a given string to the Android device"""
     ret = ldev.ctrl_transfer(0x40, 52, 0, str_id, str_val, 0)
     assert ret == len(str_val)
     return 
+
 
 def sensor_variation(toss):
     """Return sensor variation"""
@@ -88,6 +98,7 @@ def sensor_variation(toss):
         -10: -1,
         10: 1
     }.get(toss, 0)
+
 
 def sensor_output(lsensor, variation):
     """Keep the sensor value between 0 and 100"""
@@ -98,6 +109,7 @@ def sensor_output(lsensor, variation):
         if output > 100:
             output = 100
     return output
+
 
 def communication_loop(ldev):
     """Accessory client to device communication loop"""
@@ -141,6 +153,7 @@ def communication_loop(ldev):
         time.sleep(0.2)
     return
 
+
 def main():
     """Where everything starts"""
     print "Looking for an Android device"
@@ -154,7 +167,6 @@ def main():
         print "Will now communicate with device"
         communication_loop(adev)
         break
-        time.sleep(1)
 
 if __name__ == '__main__':
     main()
