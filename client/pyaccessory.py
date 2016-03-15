@@ -34,6 +34,10 @@ def get_android_dev():
     """Look for a potential Android device"""
     ldev = usb.core.find(bDeviceClass=0)
     if ldev:
+        # give time for a mount by the OS
+        time.sleep(2)
+        # request again a device handler
+        ldev = usb.core.find(bDeviceClass=0)
         print "Device found"
         print "VID: {:#04x} PID: {:#04x}".format(
             ldev.idVendor,
@@ -51,7 +55,6 @@ def set_protocol(ldev):
         else:
             sys.exit(e)
     ret = ldev.ctrl_transfer(0xC0, 51, 0, 0, 2)
-    print ret
     protocol = ret[0]
     print "Protocol version: {}".format(protocol)
     return
