@@ -17,8 +17,6 @@ import android.util.Log;
 import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbAccessory;
 
-import com.arnaudbertrand.pyaccessory.R;
-
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
