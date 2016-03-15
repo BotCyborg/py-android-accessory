@@ -1,7 +1,5 @@
 package io.arnaudbertrand.pyaccessory;
 
-
-
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.design.widget.FloatingActionButton;
@@ -18,8 +16,6 @@ import android.content.Context;
 import android.util.Log;
 import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbAccessory;
-
-import com.arnaudbertrand.pyaccessory.R;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
